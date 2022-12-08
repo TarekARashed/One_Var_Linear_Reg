@@ -1,0 +1,10 @@
+from Linear_Regression_Class import Linear_Regression
+import numpy as np
+
+
+x_train=np.array([1,2])
+y_train=np.array([5, 8])
+
+
+Model= Linear_Regression(x_train, y_train)
+Model.fit(2000)
