@@ -1,0 +1,89 @@
+#from typing_extensions import Self
+import numpy as np
+import matplotlib.pyplot as plt
+
+class Cost(object):
+    def Compute_Cost_Functiion(self, i):
+        Cost_Function=0
+        m=self.x.shape[0]
+        y_predict=[]
+        for x_i in range(m):
+            Predicted= self.w*self.x[x_i] +self.b
+            y_predict.append(Predicted)
+            Cost_Function=Cost_Function + pow(Predicted-self.y[x_i],2)
+        self.reportIteration+=1
+        if self.reportIteration==self.report:
+            plt.plot(self.x, self.y, color="blue")
+            plt.plot(self.x,  self.w*self.x +self.b)
+            #print (self.x,  ":", self.w*self.x +self.b)
+            plt.scatter(self.x, self.y)
+            plt.show()
+            self.reportIteration=0
+        Total_Cost_Function=1/(2*m)*Cost_Function
+        return (Total_Cost_Function)
+
+class Gradient(Cost):
+    def __init__(self):
+        self.dj_dw=0
+        self.dj_db=0
+        self.alph=0.0001
+        
+   
+    def Compute_Gradient_Descent(self):
+        dj_dw=0
+        dj_db=0
+        m=self.x.shape[0] 
+        for i in range(m):
+            f_wb=self.w*self.x[i]+self.b
+            print (self.x[i], ":", self.b, ":", f_wb)
+            dj_dw_i=(f_wb-self.y[i])*self.x[i]
+            dj_db_i=f_wb-self.y[i]
+            #print (dj_dw_i, ":", dj_db_i)
+            dj_dw+=dj_dw_i
+            dj_db+=dj_db_i
+        dj_dw=dj_dw/m
+        dj_db=dj_db/m
+        return (dj_dw, dj_db)
+
+    def Gradient_Descent(self, iteration):
+        CostF_W=[0, 0]
+        HistoryPlot=[]
+        self.report=int(iteration/10)
+        for i in range(iteration):
+            Total_Cost_Function=self.Compute_Cost_Functiion(i)
+            HistoryPlot.append(CostF_W)
+            HistoryPlot[len(HistoryPlot)-1][0]=self.w
+            HistoryPlot[len(HistoryPlot)-1][1]=Total_Cost_Function
+            CostF_W=[0, 0]
+            self.dj_dw,self.dj_db= self.Compute_Gradient_Descent()
+            self.w=self.w-self.alph*self.dj_dw
+            self.b=self.b-self.alph*self.dj_db
+            #print (self.w, "and", self.b)
+            #print ("ok")
+        self.Plotting_Data(HistoryPlot)
+    def Plotting_Data(self,HistoryPlot):
+        PlotData=np.array(HistoryPlot)
+        Dim_x=PlotData[:,:1]
+        m=PlotData.shape[0]-1
+
+        Dim_y=PlotData[:,1:2]
+        print ("\nfirst w=", Dim_x[0], "  last w=", Dim_x[m])
+        print ("\nfirst cost F=", Dim_y[0], "  last Cost F=", Dim_y[m])
+        print (f" \n d-w: {self.dj_dw}",  f" d_b: {self.dj_db}")
+        
+class Linear_Regression(Gradient):
+    def __init__(self,X_train,Y_train):
+        self.x = np.array(X_train)
+        self.y = np.array(Y_train)
+        self.w=0
+        self.b=0
+        self.report=0
+        self.reportIteration=0
+        Gradient.__init__(self)
+        
+        
+    def fit(self, iteration):
+        plt.plot(self.x, self.y, color='red')
+        #plt.show()
+        HistoryPlot=[[],[]]
+        HistoryPlot=self.Gradient_Descent(iteration)
